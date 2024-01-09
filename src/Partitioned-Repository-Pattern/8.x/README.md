@@ -23,4 +23,4 @@ Add settings:
 The main branch is now on .NET 8.0.
 
 ## Learn more
-[Aprueba examen AZ-204: Desarrollo de soluciones para Microsoft Azure](https://arbems.com)
+[Partitioned Repository Pattern - Azure Cosmos DB Sample](https://arbems.com)
