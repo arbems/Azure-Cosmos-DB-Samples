@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Application.Interfaces;
-using Azure;
 using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json.Linq;
 

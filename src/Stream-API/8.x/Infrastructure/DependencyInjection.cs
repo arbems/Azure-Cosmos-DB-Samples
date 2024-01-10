@@ -1,7 +1,4 @@
-﻿using System;
-using Application.Interfaces;
-using Infrastructure.Repositories;
-using Infrastructure.Settings;
+﻿using Infrastructure.Settings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 

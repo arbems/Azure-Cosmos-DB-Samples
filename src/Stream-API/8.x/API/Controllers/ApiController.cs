@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Text;
 using Infrastructure.Repositories;
 using Infrastructure.Settings;
@@ -43,7 +42,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [Route("{containerId}")]
-        public async Task<Stream?> Post(string containerId, [FromForm] string item, [FromQuery] string[] args)
+        public async Task<Stream?> Post(string containerId, [FromForm] string data, [FromQuery] string[] args)
         {
             var container = _settings.Containers
                 .FirstOrDefault(a => a.ContainerId == containerId) ?? throw new ArgumentException("ContainerId not found.");
@@ -57,13 +56,13 @@ namespace WebApi.Controllers
                 container.DatabaseId,
                 container.ContainerId);
 
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(item));
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
             return await cosmosRepository.CreateItemAsync(stream, container.PkInfo.PartitionKey, repo.ResolvePartitionKey(container.PkInfo.Template, container.PkInfo.Pattern, args));
         }
 
         [HttpPut]
         [Route("{containerId}/{id}")]
-        public async Task<Stream?> Put(string containerId, string id, [FromForm] string item, [FromQuery] string[] args)
+        public async Task<Stream?> Put(string containerId, string id, [FromForm] string data, [FromQuery] string[] args)
         {
             var container = _settings.Containers
                 .FirstOrDefault(a => a.ContainerId == containerId) ?? throw new ArgumentException("ContainerId not found.");
@@ -71,7 +70,7 @@ namespace WebApi.Controllers
             var repo = ActivatorUtilities.CreateInstance<CosmosRepository>
                 (_serviceProvider, _cosmosClient, container.DatabaseId, container.ContainerId);
 
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(item));
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
             return await repo.ReplaceItemAsync(stream, id, repo.ResolvePartitionKey(container.PkInfo.Template, container.PkInfo.Pattern, args));
         }
 

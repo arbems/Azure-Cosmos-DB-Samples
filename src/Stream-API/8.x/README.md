@@ -1,5 +1,13 @@
 # Stream API - Azure Cosmos DB Sample
-This repository contains an example of web API using Stream Repository with Azure Cosmos DB, ASP.NET Core and Clean architecture.
+This repository contains an example web API that uses Stream Operations with Azure Cosmos DB, ASP.NET Core, and Clean architecture.
+
+Cosmos DB Features:
+* Partitioned Repository Pattern
+* Cosmos Settings: Containers
+* Stream operations
+* Resolve PartitionKey
+* JSON Schema Validator
+* Evaluate Cosmos Error
 
 ## Getting Started
 Add connectionString and databaseName Cosmos settings:
