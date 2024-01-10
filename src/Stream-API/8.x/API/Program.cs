@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 CosmosSettings settings = builder.Configuration.GetSection("Cosmos").Get<CosmosSettings>()!;
 await builder.Services.AddCosmosDb(settings);
+builder.Services.AddSettings(settings);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -8,8 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Infrastructure;
 public static class DependencyInjection
 {
-    public static async Task<IServiceCollection> AddCosmosDb(this IServiceCollection services,
-        CosmosSettings settings)
+    public static async Task<IServiceCollection> AddCosmosDb(this IServiceCollection services, CosmosSettings settings)
     {
         await EnsureDbSetup(settings.ConnString, settings.Containers);
 
@@ -27,6 +26,11 @@ public static class DependencyInjection
 
         services.AddSingleton(cosmosClient);
 
+        return services;
+    }
+
+    public static IServiceCollection AddSettings(this IServiceCollection services, CosmosSettings settings)
+    {
         services.AddSingleton(settings);
 
         return services;
@@ -37,9 +41,10 @@ public static class DependencyInjection
         using CosmosClient client = new(connString);
         foreach (var container in containers)
         {
-            DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(container.DatabaseId);
+            DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(container.DatabaseId);
 
-            await database.Database.CreateContainerIfNotExistsAsync(container.ContainerId, container.PkInfo.PartitionKey);
+            await response.Database
+                .CreateContainerIfNotExistsAsync(container.ContainerId, container.PkInfo.PartitionKey);
         }
     }
 }
