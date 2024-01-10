@@ -4,7 +4,7 @@ using Microsoft.Azure.Cosmos;
 
 namespace Infrastructure.Repositories;
 
-public class ToDoItemRepository(CosmosClient cosmosClient) : CosmosDbRepository<TodoItem>(cosmosClient), IToDoItemRepository
+public class TodoItemRepository(CosmosClient cosmosClient) : CosmosRepository<TodoItem>(cosmosClient), IToDoItemRepository
 {
     public override string DatabaseId { get; } = "db1";
     public override string ContainerId { get; } = "Todo";

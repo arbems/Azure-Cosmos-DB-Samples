@@ -1,8 +1,8 @@
 ﻿namespace Infrastructure.Settings;
 
-public class CosmosDbSettings
+public class CosmosSettings
 {
-    public required string ConnectionString { get; set; }
+    public required string ConnString { get; set; }
     public required IReadOnlyList<ContainerInfo> Containers { get; set; }
 
     public List<(string, string)> GetContainersToInitialize()
@@ -16,5 +16,12 @@ public class ContainerInfo
 {
     public required string DatabaseId { get; set; }
     public required string ContainerId { get; set; }
+    public required PartitionKeyInfo PkInfo { get; set; }
+}
+
+public class PartitionKeyInfo
+{
     public required string PartitionKey { get; set; }
+    public required string Template { get; set; }
+    public required string Pattern { get; set; }
 }

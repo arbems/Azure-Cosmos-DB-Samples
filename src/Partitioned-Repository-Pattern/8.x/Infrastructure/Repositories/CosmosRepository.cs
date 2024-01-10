@@ -8,7 +8,7 @@ using Microsoft.Azure.Cosmos.Linq;
 
 namespace Infrastructure.Repositories;
 
-public abstract class CosmosDbRepository<T> : IRepository<T>, IContainerContext<T> where T : BaseEntity
+public abstract class CosmosRepository<T> : IRepository<T>, IContainerContext<T> where T : BaseEntity
 {
     public abstract string DatabaseId { get; }
 
@@ -23,7 +23,7 @@ public abstract class CosmosDbRepository<T> : IRepository<T>, IContainerContext<
     /// </summary>
     private readonly Container _container;
 
-    public CosmosDbRepository(CosmosClient cosmosClient)
+    public CosmosRepository(CosmosClient cosmosClient)
     {
         _container = cosmosClient.GetContainer(DatabaseId, ContainerId);
 

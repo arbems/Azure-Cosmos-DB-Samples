@@ -2,10 +2,10 @@
 This repository contains an example of web API using Partitioned Repository Pattern with Azure Cosmos DB, ASP.NET Core and Clean architecture.
 
 ## Getting Started
-Add settings:
+Add connectionString and databaseName Cosmos settings:
 ```
-"CosmosDbSettings": {
-    "ConnectionString": "<connString>",
+"Cosmos": {
+    "ConnString": "<connectionString>",
     "Containers": [
       {
         "DatabaseId": "<databaseName>",

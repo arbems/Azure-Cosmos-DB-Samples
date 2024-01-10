@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System;
+using Application.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.Settings;
 using Microsoft.Azure.Cosmos;
@@ -26,6 +27,8 @@ public static class DependencyInjection
 
         services.AddSingleton(cosmosClient);
 
+        services.AddSingleton(settings);
+
         return services;
     }
 
@@ -36,7 +39,7 @@ public static class DependencyInjection
         {
             DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(container.DatabaseId);
 
-            await database.Database.CreateContainerIfNotExistsAsync(container.ContainerId, container.PartitionKey);
+            await database.Database.CreateContainerIfNotExistsAsync(container.ContainerId, container.PkInfo.PartitionKey);
         }
     }
 }

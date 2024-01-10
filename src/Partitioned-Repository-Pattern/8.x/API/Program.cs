@@ -4,7 +4,7 @@ using Infrastructure.Settings;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-CosmosDbSettings settings = builder.Configuration.GetSection("CosmosDbSettings").Get<CosmosDbSettings>()!;
+CosmosSettings settings = builder.Configuration.GetSection("Cosmos").Get<CosmosSettings>()!;
 await builder.Services.AddCosmosDb(settings);
 
 builder.Services.AddControllers();
