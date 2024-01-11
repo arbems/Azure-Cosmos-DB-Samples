@@ -1,14 +1,38 @@
-﻿using Infrastructure.Settings;
+﻿using Application.Interfaces;
+using Domain.Entities;
+using Infrastructure.Repositories;
+using Infrastructure.Settings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure;
 public static class DependencyInjection
 {
-    public static async Task<IServiceCollection> AddCosmosDb(this IServiceCollection services, CosmosSettings settings)
+    public static async Task<IServiceCollection> AddInfrastructureServices(this IServiceCollection services, ICosmosSettings settings)
     {
-        await EnsureDbSetup(settings.ConnString, settings.Containers);
+        await InitializeDatabaseIfNotExists(settings.ConnString, settings.Containers);
 
+        await InitializeCosmos(services, settings);
+
+        InitializeSettings(services, settings);
+
+        return services;
+    }
+
+    public static async Task InitializeDatabaseIfNotExists(string connString, IReadOnlyList<ContainerInfo> containers)
+    {
+        using CosmosClient client = new(connString);
+        foreach (var container in containers)
+        {
+            DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(container.DatabaseId);
+
+            await response.Database
+                .CreateContainerIfNotExistsAsync(container.ContainerId, container.PkInfo.PartitionKey);
+        }
+    }
+
+    private static async Task InitializeCosmos(IServiceCollection services, ICosmosSettings settings)
+    {
         var cosmosClient = await CosmosClient.CreateAndInitializeAsync(
             settings.ConnString,
             settings.GetContainersToInitialize(),
@@ -23,25 +47,11 @@ public static class DependencyInjection
 
         services.AddSingleton(cosmosClient);
 
-        return services;
+        services.AddTransient<ICosmosRepositoryFactory, CosmosRepositoryFactory>();
     }
 
-    public static IServiceCollection AddSettings(this IServiceCollection services, CosmosSettings settings)
+    public static void InitializeSettings(IServiceCollection services, ICosmosSettings settings)
     {
-        services.AddSingleton(settings);
-
-        return services;
-    }
-
-    public static async Task EnsureDbSetup(string connString, IReadOnlyList<ContainerInfo> containers)
-    {
-        using CosmosClient client = new(connString);
-        foreach (var container in containers)
-        {
-            DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(container.DatabaseId);
-
-            await response.Database
-                .CreateContainerIfNotExistsAsync(container.ContainerId, container.PkInfo.PartitionKey);
-        }
+        services.AddSingleton(sp => settings);
     }
 }

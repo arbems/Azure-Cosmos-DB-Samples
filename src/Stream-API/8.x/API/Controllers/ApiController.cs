@@ -1,6 +1,9 @@
 using System.Text;
+using Application.DataObject.Commands.CreateDataObject;
+using Application.DataObject.Queries.GetById;
+using Application.Interfaces;
 using Infrastructure.Repositories;
-using Infrastructure.Settings;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 
@@ -8,23 +11,17 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ApiController(CosmosClient cosmosClient, CosmosSettings settings, IServiceProvider serviceProvider) : ControllerBase
+    public class ApiController(CosmosClient cosmosClient, ICosmosSettings settings, IServiceProvider serviceProvider) : ControllerBase
     {
         private readonly CosmosClient _cosmosClient = cosmosClient;
-        private readonly CosmosSettings _settings = settings;
+        private readonly ICosmosSettings _settings = settings;
         private readonly IServiceProvider _serviceProvider = serviceProvider;
 
         [HttpGet]
-        [Route("{containerId}/{id}")]
-        public async Task<Stream?> Get(string containerId, string id, [FromQuery] string[] args)
+        [Route("{ContainerId}/{Id}")]
+        public async Task<Stream?> Get(ISender sender, [FromQuery] GetDataByIdQuery query)
         {
-            var container = _settings.Containers
-                .FirstOrDefault(a => a.ContainerId == containerId) ?? throw new ArgumentException("ContainerId not found.");
-
-            var repo = ActivatorUtilities.CreateInstance<CosmosRepository>
-                (_serviceProvider, _cosmosClient, container.DatabaseId, container.ContainerId);
-
-            return await repo.GetItemAsync(id, repo.ResolvePartitionKey(container.PkInfo.Template, container.PkInfo.Pattern, args));
+            return await sender.Send(query);
         }
 
         [HttpGet]
@@ -41,26 +38,13 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("{containerId}")]
-        public async Task<Stream?> Post(string containerId, [FromForm] string data, [FromQuery] string[] args)
+        [Route("{ContainerId}")]
+        public async Task<Stream?> Post(ISender sender, CreateDataObjectCommand command)
         {
-            var container = _settings.Containers
-                .FirstOrDefault(a => a.ContainerId == containerId) ?? throw new ArgumentException("ContainerId not found.");
-
-            var repo = ActivatorUtilities.CreateInstance<CosmosRepository>
-                (_serviceProvider, _cosmosClient, container.DatabaseId, container.ContainerId);
-
-            var cosmosRepository = ActivatorUtilities.CreateInstance<CosmosRepository>(
-                _serviceProvider, 
-                _cosmosClient,
-                container.DatabaseId,
-                container.ContainerId);
-
-            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(data));
-            return await cosmosRepository.CreateItemAsync(stream, container.PkInfo.PartitionKey, repo.ResolvePartitionKey(container.PkInfo.Template, container.PkInfo.Pattern, args));
+            return await sender.Send(command);
         }
 
-        [HttpPut]
+        /*[HttpPut]
         [Route("{containerId}/{id}")]
         public async Task<Stream?> Put(string containerId, string id, [FromForm] string data, [FromQuery] string[] args)
         {
@@ -85,6 +69,6 @@ namespace WebApi.Controllers
                 (_serviceProvider, _cosmosClient, container.DatabaseId, container.ContainerId);
 
             return await repo.DeleteItemAsync(id, repo.ResolvePartitionKey(container.PkInfo.Template, container.PkInfo.Pattern, args));
-        }
+        }*/
     }
 }

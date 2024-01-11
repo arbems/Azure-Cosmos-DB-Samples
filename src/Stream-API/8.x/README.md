@@ -2,10 +2,13 @@
 This repository contains an example web API that uses Stream Operations with Azure Cosmos DB, ASP.NET Core, and Clean architecture.
 
 Cosmos DB Features:
+* Initializes the client with containers provided
+* Cosmos settings: ContaninerInfo & PartitionKeyInfo
 * Partitioned Repository Pattern
 * Cosmos Settings: Containers
 * Stream operations
 * Resolve PartitionKey
+* Optimistic concurrency control
 * JSON Schema Validator
 * Evaluate Cosmos Error
 

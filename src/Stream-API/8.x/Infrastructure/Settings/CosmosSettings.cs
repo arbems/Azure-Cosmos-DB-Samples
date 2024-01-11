@@ -1,6 +1,9 @@
-﻿namespace Infrastructure.Settings;
+﻿using Application.Interfaces;
+using Domain.Entities;
 
-public class CosmosSettings
+namespace Infrastructure.Settings;
+
+public class CosmosSettings : ICosmosSettings
 {
     public required string ConnString { get; set; }
     public required IReadOnlyList<ContainerInfo> Containers { get; set; }
@@ -11,17 +14,4 @@ public class CosmosSettings
             .Select(container => (container.DatabaseId, container.ContainerId))
             .ToList();
     }
-}
-public class ContainerInfo
-{
-    public required string DatabaseId { get; set; }
-    public required string ContainerId { get; set; }
-    public required PartitionKeyInfo PkInfo { get; set; }
-}
-
-public class PartitionKeyInfo
-{
-    public required string PartitionKey { get; set; }
-    public required string Template { get; set; }
-    public required string Pattern { get; set; }
 }
