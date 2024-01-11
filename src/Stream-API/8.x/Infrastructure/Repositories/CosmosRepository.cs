@@ -4,26 +4,19 @@ using Microsoft.Azure.Cosmos;
 
 namespace Infrastructure.Repositories;
 
-public class CosmosRepository : ICosmosRepository
+public class CosmosRepository(CosmosClient cosmosClient) : ICosmosRepository
 {
-    private readonly string _databaseId;
-    private readonly string _containerId;
-    private readonly Container _container;
-
-    public CosmosRepository(CosmosClient cosmosClient, string databaseId, string containerId)
+    private readonly CosmosClient _cosmosClient = cosmosClient;
+    private Container? _container;
+    public void SetContainer(string databaseId, string containerId)
     {
-        _databaseId = databaseId;
-        _containerId = containerId;
-        _container = cosmosClient.GetContainer(_databaseId, _containerId);
-
-        if (_container is null)
-        {
-            throw new ArgumentException("ContainerId cannot be null or empty.");
-        }
+        _container = _cosmosClient.GetContainer(databaseId, containerId);
     }
 
     public async Task<Stream?> GetItemAsync(string id, PartitionKeyInfo pkInfo, string[] pkArgs)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         var partitionKeyValue = pkInfo.ResolvePartitionKey(pkArgs);
 
         ResponseMessage response = await _container.ReadItemStreamAsync(
@@ -38,6 +31,8 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<Stream?> GetItemQueryAsync(string query)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         QueryDefinition queryDefinition = new(query);
 
         using FeedIterator feedIterator = _container.GetItemQueryStreamIterator(
@@ -63,6 +58,8 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<Stream?> UpsertItemAsync(Stream item, PartitionKeyInfo pkInfo, string[] pkArgs)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         var partitionKeyValue = pkInfo.ResolvePartitionKey(pkArgs);
         var modifiedStream = pkInfo.AddPartitionKeyToStream(item, partitionKeyValue);
 
@@ -79,6 +76,8 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<Stream?> CreateItemAsync(Stream item, PartitionKeyInfo pkInfo, string[] pkArgs)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         var partitionKeyValue = pkInfo.ResolvePartitionKey(pkArgs);
         var modifiedStream = pkInfo.AddPartitionKeyToStream(item, partitionKeyValue);
 
@@ -94,6 +93,8 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<Stream?> ReplaceItemAsync(Stream item, string id, PartitionKeyInfo pkInfo, string[] itemArgs)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         var partitionKeyValue = pkInfo.ResolvePartitionKey(itemArgs);
         var modifiedStream = pkInfo.AddPartitionKeyToStream(item, partitionKeyValue);
 
@@ -107,6 +108,8 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<Stream?> PatchItemAsync(object[]? patchOperations, string id, PartitionKeyInfo pkInfo, string[] pkArgs)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         var partitionKeyValue = pkInfo.ResolvePartitionKey(pkArgs);
 
         try
@@ -131,6 +134,8 @@ public class CosmosRepository : ICosmosRepository
 
     public async Task<Stream?> DeleteItemAsync(string id, PartitionKeyInfo pkInfo, string[] pkArgs)
     {
+        if (_container is null) throw new Exception("ContainerId is null or empty.");
+
         var partitionKeyValue = pkInfo.ResolvePartitionKey(pkArgs);
 
         ResponseMessage response = await _container.DeleteItemStreamAsync(id, new PartitionKey(partitionKeyValue));

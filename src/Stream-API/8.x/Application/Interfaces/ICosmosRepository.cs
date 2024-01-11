@@ -4,6 +4,7 @@ namespace Application.Interfaces;
 
 public interface ICosmosRepository
 {
+    void SetContainer(string databaseId, string containerId);
     Task<Stream?> GetItemAsync(string id, PartitionKeyInfo pkinfo, string[] args);
     Task<Stream?> GetItemQueryAsync(string query);
     Task<Stream?> CreateItemAsync(Stream item, PartitionKeyInfo pkinfo, string[] args);

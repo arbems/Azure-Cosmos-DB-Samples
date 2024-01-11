@@ -1,7 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Repositories;
-using Infrastructure.Settings;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -47,7 +46,7 @@ public static class DependencyInjection
 
         services.AddSingleton(cosmosClient);
 
-        services.AddTransient<ICosmosRepositoryFactory, CosmosRepositoryFactory>();
+        services.AddTransient<ICosmosRepository, CosmosRepository>();
     }
 
     public static void InitializeSettings(IServiceCollection services, ICosmosSettings settings)

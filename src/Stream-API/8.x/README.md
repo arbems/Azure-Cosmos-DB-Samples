@@ -4,10 +4,10 @@ This repository contains an example web API that uses Stream Operations with Azu
 Cosmos DB Features:
 * Initializes the client with containers provided
 * Cosmos settings: ContaninerInfo & PartitionKeyInfo
-* Partitioned Repository Pattern
+* Partitioned Repository Pattern: Stream Operations
 * Cosmos Settings: Containers
 * Stream operations
-* Resolve PartitionKey
+* Resolve Partition Key
 * Optimistic concurrency control
 * JSON Schema Validator
 * Evaluate Cosmos Error
