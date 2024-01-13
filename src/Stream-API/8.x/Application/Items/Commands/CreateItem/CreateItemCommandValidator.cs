@@ -3,9 +3,9 @@ using FluentValidation;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 
-namespace Application.DataObject.Commands.CreateDataObject;
+namespace Application.Items.Commands.CreateItem;
 
-public class CreateItemCommandValidator : AbstractValidator<CreateDataObjectCommand>
+public class CreateItemCommandValidator : AbstractValidator<CreateItemCommand>
 {
     private readonly ICosmosSettings _settings;
 
@@ -16,7 +16,7 @@ public class CreateItemCommandValidator : AbstractValidator<CreateDataObjectComm
         RuleFor(v => v.Item)
         .Custom((item, context) =>
         {
-            var containerId = (context.InstanceToValidate)?.ContainerId;
+            var containerId = context.InstanceToValidate?.ContainerId;
             if (containerId == null)
             {
                 context.AddFailure("ContainerId is required.");

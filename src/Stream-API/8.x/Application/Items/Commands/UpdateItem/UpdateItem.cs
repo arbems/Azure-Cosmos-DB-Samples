@@ -1,31 +1,35 @@
-﻿using Application.Interfaces;
+﻿using System.Text;
+using Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Application.DataObject.Queries.GetById;
+namespace Application.Items.Commands.UpdateItem;
 
-public record GetDataByIdQuery : IRequest<Stream?>
+public record UpdateItemCommand : IRequest<Stream?>
 {
-    [FromRoute]
     public required string ContainerId { get; init; }
-    [FromRoute]
     public required string Id { get; init; }
-    [FromQuery(Name = "args")]
+    [FromForm]
+    public required string Item { get; init; }
+    [FromForm]
     public required string[] Args { get; init; }
 }
 
-public class GetDataByIdQueryHandler(ICosmosRepository cosmosRepository, ICosmosSettings settings) : IRequestHandler<GetDataByIdQuery, Stream?>
+public class UpdateItemCommandHandler(ICosmosRepository cosmosRepository, ICosmosSettings settings)
+    : IRequestHandler<UpdateItemCommand, Stream?>
 {
     private readonly ICosmosRepository _cosmosRepository = cosmosRepository;
     private readonly ICosmosSettings _settings = settings;
 
-    public async Task<Stream?> Handle(GetDataByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Stream?> Handle(UpdateItemCommand request, CancellationToken cancellationToken)
     {
         var containerSettings = _settings.Containers.FirstOrDefault(a => a.ContainerId == request.ContainerId)
             ?? throw new ArgumentException("ContainerId not found.");
 
         _cosmosRepository.SetContainer(containerSettings.DatabaseId, containerSettings.ContainerId);
-        return await _cosmosRepository.GetItemAsync(
+        using var item = new MemoryStream(Encoding.UTF8.GetBytes(request.Item));
+        return await _cosmosRepository.ReplaceItemAsync(
+            item,
             request.Id,
             containerSettings.PkInfo,
             request.Args);
